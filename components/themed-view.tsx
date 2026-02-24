@@ -1,10 +1,13 @@
+import { cssInterop } from 'nativewind';
 import { View, type ViewProps } from 'react-native';
+
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export type ThemedViewProps = ViewProps & {
   lightColor?: string;
   darkColor?: string;
+  className?: string;
 };
 
 export function ThemedView({ style, lightColor, darkColor, ...otherProps }: ThemedViewProps) {
@@ -12,3 +15,5 @@ export function ThemedView({ style, lightColor, darkColor, ...otherProps }: Them
 
   return <View style={[{ backgroundColor }, style]} {...otherProps} />;
 }
+
+cssInterop(ThemedView, { className: "style" });
