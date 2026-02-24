@@ -1,50 +1,315 @@
-# Welcome to your Expo app 👋
+<div align="center">
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# 📚 Mini LMS Pro
 
-## Get started
+### Production-Grade Mobile Learning Platform
 
-1. Install dependencies
+#### Built with React Native • Expo • TypeScript (Strict Mode)
 
-   ```bash
-   npm install
-   ```
+<br/>
 
-2. Start the app
+<p>
+  <strong>Scalable Architecture • Secure Auth • Offline-First • Performance Optimized</strong>
+</p>
 
-   ```bash
-   npx expo start
-   ```
+<br/>
 
-In the output, you'll find options to open the app in a
+![Expo](https://img.shields.io/badge/Expo-SDK%20Latest-black?logo=expo)
+![React Native](https://img.shields.io/badge/React%20Native-Production%20Ready-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Mode-3178C6?logo=typescript)
+![Architecture](https://img.shields.io/badge/Architecture-Clean%20Modular-blue)
+![Engineering](https://img.shields.io/badge/Engineering-FAANG%20Level-purple)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+</div>
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+# 🧠 Executive Summary
 
-When you're ready, run:
+**Mini LMS Pro** is a senior-level mobile engineering project designed using real-world production standards.
+
+This repository demonstrates how scalable mobile applications should be architected — with a strong focus on:
+
+- Clean architecture principles
+- Security-first authentication
+- Offline resilience
+- Performance optimization
+- Modular scalability
+- Type safety & maintainability
+
+This project simulates what a real-world LMS mobile product would look like inside a production engineering team.
+
+---
+
+# 🏗 System Architecture
+
+## Architectural Principles
+
+- Feature-based modular structure
+- Separation of concerns (UI / Domain / Services)
+- Centralized networking layer
+- Secure persistent storage
+- Predictable state management
+- Offline-first design strategy
+- Strict typing across layers
+
+---
+
+## 📂 Project Structure
 
 ```bash
-npm run reset-project
+app/            → File-based routing (Expo Router)
+features/       → Domain-driven feature modules
+services/       → API client, storage, network layer
+store/          → Global state container
+components/     → Reusable UI primitives
+utils/          → Shared helpers
+types/          → Type definitions & contracts
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+# 🔐 Authentication Architecture
 
-To learn more about developing your project with Expo, look at the following resources:
+Designed with production security patterns:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- API-driven login & registration
+- Secure token storage via encrypted storage
+- Automatic session restoration
+- Access token refresh handling
+- Secure logout & full state reset
+- Centralized auth guard
 
-## Join the community
+### Security Considerations
 
-Join our community of developers creating universal apps.
+- No token exposure in UI layer
+- Timeout & retry strategy
+- Persistent session validation
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+# 📚 Course Domain Module
+
+The course system is architected as an isolated feature module.
+
+### Capabilities
+
+- Instructor & course fetching
+- Virtualized high-performance list rendering
+- Pull-to-refresh
+- Debounced search
+- Bookmark persistence
+- Enrollment state management
+- Local cache fallback (offline mode)
+
+### Performance Decisions
+
+- Memoized list rows
+- Controlled re-render boundaries
+- Optimized state selectors
+- Request cancellation strategy
+
+---
+
+# 🌐 WebView Communication Layer
+
+Implements bidirectional native ↔ web communication.
+
+### Native → Web
+
+- Injected dynamic content
+- Controlled script execution
+
+### Web → Native
+
+```js
+window.ReactNativeWebView.postMessage();
+```
+
+### Use Cases
+
+- Progress updates
+- Quiz results
+- Course interaction events
+
+---
+
+# 🔔 Notification Strategy
+
+Event-driven engagement model.
+
+### Triggers
+
+- 5+ bookmarks milestone
+- 24-hour inactivity reminder
+
+### Architecture
+
+- Permission gating on first launch
+- Event-based notification dispatch
+- Clean notification abstraction layer
+
+---
+
+# 📡 Offline-First Strategy
+
+Connectivity awareness is built into the service layer.
+
+### Implementation
+
+- Network state detection
+- Offline banner state
+- Cached response fallback
+- Automatic retry on reconnect
+- Graceful degradation
+
+### Design Goal
+
+The app remains usable even without internet access.
+
+---
+
+# ⚡ Performance Engineering
+
+Intentional performance optimizations:
+
+- Memoization (`React.memo`, `useMemo`, `useCallback`)
+- Debounced search input
+- API timeout strategy
+- Retry with exponential backoff
+- Image caching
+- Minimal global state usage
+- Lazy evaluation where possible
+
+### Measured Priorities
+
+- Render stability
+- Network efficiency
+- Memory control
+- UX smoothness
+
+---
+
+# 🔑 Environment Configuration
+
+Create a `.env` file:
+
+```env
+API_BASE_URL=https://api.freeapi.app
+APP_ENV=development
+```
+
+Environment separation ready for:
+
+- Development
+- Staging
+- Production
+
+---
+
+# 🚀 Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start development server:
+
+```bash
+npx expo start
+```
+
+### Supported Environments
+
+- Android Emulator
+- iOS Simulator
+- Development Build
+- Expo Go (limited mode)
+
+---
+
+# 📦 Production Build (Android)
+
+```bash
+eas build -p android --profile development
+```
+
+Install EAS CLI if needed:
+
+```bash
+npm install -g eas-cli
+```
+
+---
+
+# 🧪 Engineering Decisions
+
+| Concern            | Strategy                          |
+| ------------------ | --------------------------------- |
+| Scalability        | Feature-based modular design      |
+| Maintainability    | Strong typing & clean separation  |
+| Security           | Encrypted storage + guarded flows |
+| Performance        | Memoization + optimized rendering |
+| Offline Resilience | Cache + retry strategy            |
+| Code Quality       | Strict TypeScript mode            |
+
+---
+
+# 🧩 Extensibility
+
+The architecture allows easy integration of:
+
+- Payment gateway
+- Video streaming module
+- Push notifications (FCM / APNS)
+- Role-based access
+- Instructor dashboard
+- Analytics tracking
+
+---
+
+# 📊 What This Project Demonstrates
+
+This repository reflects:
+
+- Senior-level mobile system design
+- Production architectural thinking
+- Clean engineering practices
+- Real-world feature abstraction
+- Scalable folder structuring
+- Enterprise-grade code organization
+
+---
+
+# 🎯 Ideal Use Cases
+
+- Portfolio showcase
+- Senior-level assignment submission
+- Architecture demonstration
+- Interview discussion project
+- System design walkthrough
+
+---
+
+# 📖 Technology Stack
+
+- React Native
+- Expo (Latest SDK)
+- TypeScript (Strict Mode)
+- Axios
+- Expo Router
+- Secure Storage
+- NetInfo
+
+---
+
+<div align="center">
+
+⭐ If this project impressed you, consider starring the repository.
+
+Built with engineering discipline and production mindset.
+
+</div>
