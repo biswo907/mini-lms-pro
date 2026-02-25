@@ -1,47 +1,76 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/src/context/AuthContext";
+import PageWrapper from "@/src/shared/PageWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { Alert, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
-  const { logout } = useAuth();
-
-  const handleLogout = async () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-        },
-      },
-    ]);
-  };
+  const { user } = useAuth();
+  const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
-      <ThemedView className="flex-1">
+    <PageWrapper>
+      {/* Keep ThemedView only for main background */}
+      <ThemedView className="flex-1 bg-slate-50 dark:bg-slate-900 pt-16 px-6">
+        
         {/* Header */}
-        <ThemedView className="flex-row justify-end p-4">
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="bg-red-500 p-2 rounded-full active:opacity-80"
-          >
-            <Ionicons name="log-out-outline" size={22} color="white" />
-          </TouchableOpacity>
-        </ThemedView>
+        <View className="flex-row justify-between items-center mb-10">
+          <View>
+            <ThemedText className="text-slate-500 dark:text-slate-400 font-medium">
+              Welcome back,
+            </ThemedText>
+            <ThemedText
+              type="subtitle"
+              className="text-2xl font-bold text-slate-900 dark:text-white"
+            >
+              {user?.username || "User"}
+            </ThemedText>
+          </View>
 
-        {/* Content */}
-        <ThemedView className="flex-1 items-center justify-center">
-          <ThemedText type="title">Home Screen</ThemedText>
-          <ThemedText className="mt-2 text-slate-500 dark:text-slate-400">
-            Welcome to your Learning Management System
+          <TouchableOpacity
+            className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl items-center justify-center shadow-sm"
+            onPress={() => router.push("/(protected)/profile")}
+          >
+            <Ionicons name="person-circle-outline" size={26} color="#3b82f6" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Progress Card */}
+        <View className="bg-blue-600 rounded-3xl p-6 shadow-lg mb-8">
+          <ThemedText className="text-blue-100 font-medium mb-1">
+            Your Progress
           </ThemedText>
-        </ThemedView>
+          <ThemedText className="text-white text-3xl font-bold mb-4">
+            You're doing great!
+          </ThemedText>
+
+          <View className="h-2 bg-blue-400 rounded-full overflow-hidden">
+            <View className="h-full bg-white w-3/4 rounded-full" />
+          </View>
+
+          <ThemedText className="text-blue-100 mt-2 text-sm italic">
+            75% of your weekly goal completed
+          </ThemedText>
+        </View>
+
+        {/* Quick Actions */}
+        <ThemedText type="subtitle" className="mb-4">
+          Quick Actions
+        </ThemedText>
+
+        <View className="flex-row flex-wrap justify-between">
+          
+          <TouchableOpacity className="w-[48%] bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm mb-4">
+            <View className="w-10 h-10 bg-purple-100 rounded-xl items-center justify-center mb-3">
+              <Ionicons name="book" size={20} color="#a855f7" />
+            </View>
+            <ThemedText className="font-bold">My Courses</ThemedText>
+          </TouchableOpacity>
+
+        </View>
       </ThemedView>
-    </SafeAreaView>
+    </PageWrapper>
   );
 }

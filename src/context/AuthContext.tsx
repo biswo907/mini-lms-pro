@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (userData: any, accessToken: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (userData: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -89,6 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace("/(auth)/login");
   };
 
+  // 5️⃣ Update User Implementation
+  const updateUser = async (userData: any) => {
+    setUser(userData);
+    await storage.setValue(STORAGE_KEYS.USER_PROFILE, userData);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -96,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}
