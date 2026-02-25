@@ -1,0 +1,143 @@
+import { useDebounce } from "@/src/hooks/useDebounce";
+import { useInstructorsQuery, useProductsInfiniteQuery } from "@/src/service/course/course.queries";
+import PageWrapper from "@/src/shared/PageWrapper";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
+import CourseCard from "../components/CourseCard";
+import SearchBar from "../components/SearchBar";
+
+const CourseCatalogScreen = () => {
+  const router = useRouter();
+  const [searchText, setSearchText] = useState("");
+  const debouncedSearchTerm = useDebounce(searchText, 500);
+
+  const {
+    data: instructorsData,
+    isLoading: isLoadingInstructors,
+  } = useInstructorsQuery(50);
+
+  const {
+    data: productsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingProducts,
+    refetch,
+    isRefetching,
+  } = useProductsInfiniteQuery(debouncedSearchTerm);
+
+  const instructors = useMemo(() => {
+    const rawUsers = instructorsData?.data?.data || instructorsData?.data || [];
+    return rawUsers.map((user: any) => ({
+      id: user.id || user.login?.uuid || Math.random().toString(),
+      name: user.name ? `${user.name.first || ""} ${user.name.last || ""}`.trim() : user.login?.username || "Instructor",
+      avatar: user.picture?.medium || user.picture?.thumbnail || "",
+      username: user.login?.username || "anonymous",
+    }));
+  }, [instructorsData]);
+
+  const courses = useMemo(() => {
+    if (!productsData || instructors.length === 0) return [];
+    
+    return productsData.pages.flatMap((page) => {
+      const productsArray = page?.data?.data || [];
+      return productsArray.map((product: any) => {
+        // Use a deterministic way to pick an instructor based on product ID
+        const productIdStr = product.id?.toString() || "";
+        const instructorIndex = productIdStr
+          ? Math.abs(productIdStr.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % instructors.length
+          : 0;
+
+        return {
+          id: product.id?.toString() || Math.random().toString(),
+          name: product.title,
+          description: product.description,
+          price: product.price,
+          category: product.category,
+          image: product.image,
+          images: product.images || [],
+          instructor: instructors[instructorIndex] || { id: "0", name: "Guest Instructor", avatar: "", username: "guest" },
+        };
+      });
+    });
+  }, [productsData, instructors]);
+
+  const onRefresh = async () => {
+    await refetch();
+  };
+
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage && !isLoadingProducts) {
+      fetchNextPage();
+    }
+  };
+
+  const handleSearch = (text: string) => {
+    setSearchText(text);
+  };
+
+  const loading = isLoadingInstructors || isLoadingProducts;
+
+  return (
+    <PageWrapper>
+      <View className="flex-1 bg-slate-50 dark:bg-slate-900 px-6 pt-8">
+        <View className="flex-row items-center mb-6">
+          <TouchableOpacity onPress={() => router.back()} className="mr-4">
+            <Ionicons name="arrow-back" size={24} color="#d3dae7ff" />
+          </TouchableOpacity>
+          <Text className="text-2xl font-bold text-slate-900 dark:text-white">
+            Course Catalog
+          </Text>
+        </View>
+
+        <SearchBar onSearch={handleSearch} />
+
+        <FlatList
+          data={courses}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <CourseCard course={item} />}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl 
+              refreshing={isRefetching} 
+              onRefresh={onRefresh}
+              tintColor="#3b82f6"
+              colors={["#3b82f6"]}
+            />
+          }
+          ListFooterComponent={() => 
+            isFetchingNextPage ? (
+              <ActivityIndicator size="small" color="#3b82f6" className="py-4" />
+            ) : (
+              !hasNextPage && courses.length > 0 ? (
+                <View className="py-8 items-center">
+                  <Text className="text-slate-400">No more courses found</Text>
+                </View>
+              ) : null
+            )
+          }
+          ListEmptyComponent={() => 
+            !loading ? (
+              <View className="flex-1 items-center justify-center pt-20">
+                <Ionicons name="search" size={48} color="#cbd5e1" />
+                <Text className="text-slate-500 mt-4 text-lg">No courses found matching "{searchText}"</Text>
+              </View>
+            ) : (
+              <View className="flex-1 items-center justify-center pt-20">
+                <ActivityIndicator size="large" color="#3b82f6" />
+                <Text className="text-slate-500 mt-4">Loading Courses...</Text>
+              </View>
+            )
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+      </View>
+    </PageWrapper>
+  );
+};
+
+export default CourseCatalogScreen;

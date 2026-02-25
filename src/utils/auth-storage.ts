@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   USER_PROFILE: "LMS_User",
   ACCESS_TOKEN: "LMS_AccessToken",
   REFRESH_TOKEN: "LMS_RefreshToken",
+  BOOKMARKS_KEY: "LMS_Course_Bookmarks"
 };
 
 // ==============================

@@ -3,12 +3,16 @@ import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/src/context/AuthContext";
 import PageWrapper from "@/src/shared/PageWrapper";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { TouchableOpacity, View } from "react-native";
+import { Href, useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
+
+  const handleNavigateToCourses = () => {
+    router.push("/(protected)/courses" as Href);
+  };
 
   return (
     <PageWrapper>
@@ -55,6 +59,18 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
 
+        {/* Featured Courses Section */}
+        <View className="flex-row justify-between items-center mb-4">
+          <ThemedText type="subtitle">Featured Courses</ThemedText>
+          <TouchableOpacity onPress={handleNavigateToCourses}>
+            <Text className="text-blue-600 font-medium">See All</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Since we don't have courses on home yet, I'll add a placeholder or a few manual ones 
+            that link to the catalog, or I could fetch them. For now, I'll just make the "See All" 
+            and "Quick Actions" work as requested. */}
+
         {/* Quick Actions */}
         <ThemedText type="subtitle" className="mb-4">
           Quick Actions
@@ -62,11 +78,14 @@ export default function HomeScreen() {
 
         <View className="flex-row flex-wrap justify-between">
           
-          <TouchableOpacity className="w-[48%] bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm mb-4">
+          <TouchableOpacity 
+            className="w-[48%] bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm mb-4"
+            onPress={handleNavigateToCourses}
+          >
             <View className="w-10 h-10 bg-purple-100 rounded-xl items-center justify-center mb-3">
               <Ionicons name="book" size={20} color="#a855f7" />
             </View>
-            <ThemedText className="font-bold">My Courses</ThemedText>
+            <ThemedText className="font-bold">Explore Courses</ThemedText>
           </TouchableOpacity>
 
         </View>
