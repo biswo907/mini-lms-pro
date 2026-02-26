@@ -61,23 +61,53 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Progress Card */}
-        <View className="bg-blue-600 rounded-3xl p-6 shadow-lg mb-8">
-          <ThemedText className="text-blue-100 font-medium mb-1">
-            Your Progress
-          </ThemedText>
-          <ThemedText className="text-white text-3xl font-bold mb-4">
-            You're doing great!
-          </ThemedText>
+        {/* Progress Card / Achievement Card */}
+        {bookmarkCount >= 5 ? (
+          <View className="bg-amber-500 rounded-3xl p-6 shadow-lg mb-8 relative overflow-hidden">
+            {/* Background Decorative Circles */}
+            <View className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full" />
+            <View className="absolute -bottom-8 -left-8 w-24 h-24 bg-white/10 rounded-full" />
+            
+            <View className="flex-row justify-between items-center mb-1">
+              <ThemedText className="text-amber-100 font-medium">
+                Milestone Reached!
+              </ThemedText>
+              <Ionicons name="trophy" size={24} color="#fff" />
+            </View>
+            
+            <ThemedText className="text-white text-3xl font-bold mb-2">
+              Achievement Unlocked! 🎯
+            </ThemedText>
+            
+            <ThemedText className="text-amber-50/90 mb-4 leading-5">
+              You've bookmarked 5 courses! You're clearly serious about learning. Ready to start your first lesson?
+            </ThemedText>
 
-          <View className="h-2 bg-blue-400 rounded-full overflow-hidden">
-            <View className="h-full bg-white w-3/4 rounded-full" />
+            <TouchableOpacity 
+              className="bg-white py-3 rounded-2xl items-center shadow-sm"
+              onPress={() => handleNavigateToCourses()}
+            >
+              <Text className="text-amber-600 font-bold">Start Learning Now</Text>
+            </TouchableOpacity>
           </View>
+        ) : (
+          <View className="bg-blue-600 rounded-3xl p-6 shadow-lg mb-8">
+            <ThemedText className="text-blue-100 font-medium mb-1">
+              Your Progress
+            </ThemedText>
+            <ThemedText className="text-white text-3xl font-bold mb-4">
+              You're doing great!
+            </ThemedText>
 
-          <ThemedText className="text-blue-100 mt-2 text-sm italic">
-            75% of your weekly goal completed
-          </ThemedText>
-        </View>
+            <View className="h-2 bg-blue-400 rounded-full overflow-hidden">
+              <View className="h-full bg-white w-3/4 rounded-full" />
+            </View>
+
+            <ThemedText className="text-blue-100 mt-2 text-sm italic">
+              75% of your weekly goal completed
+            </ThemedText>
+          </View>
+        )}
 
         {/* Featured Courses Section */}
         <View className="flex-row justify-between items-center mb-4">

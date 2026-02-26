@@ -1,12 +1,15 @@
 import { AuthProvider } from "@/src/context/AuthContext";
 import { QueryProvider } from "@/src/context/QueryProvider";
 import { SnackbarProvider } from "@/src/context/SnackbarContext";
+import { useNotifications } from "@/src/hooks/useNotifications";
 import { Slot } from "expo-router";
 import { StatusBar } from "react-native";
 import "../global.css";
 
 
 export default function RootLayout() {
+  useNotifications();
+
   return (
     <QueryProvider>
       <AuthProvider>

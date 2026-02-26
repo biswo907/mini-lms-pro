@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mini-lms-pro",
+    "name": "Mini Lms Pro",
     "slug": "mini-lms-pro",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.biswo907.minilmspro"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.biswo907.minilmspro"
     },
     "web": {
       "output": "static",
@@ -40,11 +42,18 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f92b9c12-a63e-4ecc-9f53-9ed1938a67cc"
+      }
     }
   }
 }

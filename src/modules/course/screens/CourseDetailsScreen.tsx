@@ -1,4 +1,5 @@
 import { useProductDetailsQuery } from "@/src/service/course/course.queries";
+import { NotificationService } from "@/src/service/notification/NotificationService";
 import AppModal from "@/src/shared/AppModal";
 import PageWrapper from "@/src/shared/PageWrapper";
 import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
@@ -81,6 +82,11 @@ const CourseDetailsScreen = () => {
     await storage.setValue(STORAGE_KEYS?.BOOKMARKS_KEY, bookmarks);
     setIsBookmarked(!isBookmarked);
     setShowBookmarkModal(false);
+
+    // Check for 5+ bookmarks milestone
+    if (!isBookmarked && bookmarks.length === 5) {
+      await NotificationService.scheduleBookmarkMilestoneNotification(bookmarks.length);
+    }
   };
 
   const [showEnrollModal, setShowEnrollModal] = useState(false);
