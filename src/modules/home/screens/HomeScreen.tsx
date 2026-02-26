@@ -2,16 +2,36 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/src/context/AuthContext";
 import PageWrapper from "@/src/shared/PageWrapper";
+import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { Href, useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
+  const [bookmarkCount, setBookmarkCount] = useState(0);
 
-  const handleNavigateToCourses = () => {
-    router.push("/(protected)/courses" as Href);
+  useFocusEffect(
+    useCallback(() => {
+      const getBookmarks = async () => {
+        const bookmarks = await storage.getValue(STORAGE_KEYS.BOOKMARKS_KEY);
+        if (bookmarks) {
+          setBookmarkCount(bookmarks.length);
+        } else {
+          setBookmarkCount(0);
+        }
+      };
+      getBookmarks();
+    }, [])
+  );
+
+  const handleNavigateToCourses = (filter?: string) => {
+    router.push({
+      pathname: "/(protected)/courses",
+      params: filter ? { filter } : {}
+    } as any);
   };
 
   return (
@@ -62,7 +82,7 @@ export default function HomeScreen() {
         {/* Featured Courses Section */}
         <View className="flex-row justify-between items-center mb-4">
           <ThemedText type="subtitle">Featured Courses</ThemedText>
-          <TouchableOpacity onPress={handleNavigateToCourses}>
+          <TouchableOpacity onPress={() => handleNavigateToCourses()}>
             <Text className="text-blue-600 font-medium">See All</Text>
           </TouchableOpacity>
         </View>
@@ -80,12 +100,23 @@ export default function HomeScreen() {
           
           <TouchableOpacity 
             className="w-[48%] bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm mb-4"
-            onPress={handleNavigateToCourses}
+            onPress={() => handleNavigateToCourses()}
           >
             <View className="w-10 h-10 bg-purple-100 rounded-xl items-center justify-center mb-3">
               <Ionicons name="book" size={20} color="#a855f7" />
             </View>
             <ThemedText className="font-bold">Explore Courses</ThemedText>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            className="w-[48%] bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-sm mb-4"
+            onPress={() => handleNavigateToCourses("bookmarks")}
+          >
+            <View className="w-10 h-10 bg-blue-100 rounded-xl items-center justify-center mb-3">
+              <Ionicons name="bookmark" size={20} color="#3b82f6" />
+            </View>
+            <ThemedText className="font-bold">Bookmarks</ThemedText>
+            <Text className="text-slate-500 text-xs mt-1">{bookmarkCount} items</Text>
           </TouchableOpacity>
 
         </View>

@@ -1,17 +1,37 @@
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { useInstructorsQuery, useProductsInfiniteQuery } from "@/src/service/course/course.queries";
 import PageWrapper from "@/src/shared/PageWrapper";
+import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import CourseCard from "../components/CourseCard";
 import SearchBar from "../components/SearchBar";
 
 const CourseCatalogScreen = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const filter = params.filter as string;
+
   const [searchText, setSearchText] = useState("");
   const debouncedSearchTerm = useDebounce(searchText, 500);
+
+  const [bookmarkedCourses, setBookmarkedCourses] = useState<any[]>([]);
+  const [loadingBookmarks, setLoadingBookmarks] = useState(false);
+
+  useEffect(() => {
+    if (filter === "bookmarks") {
+      loadBookmarks();
+    }
+  }, [filter]);
+
+  const loadBookmarks = async () => {
+    setLoadingBookmarks(true);
+    const bookmarks = await storage.getValue(STORAGE_KEYS.BOOKMARKS_KEY);
+    setBookmarkedCourses(bookmarks || []);
+    setLoadingBookmarks(false);
+  };
 
   const {
     data: instructorsData,
@@ -39,6 +59,13 @@ const CourseCatalogScreen = () => {
   }, [instructorsData]);
 
   const courses = useMemo(() => {
+    if (filter === "bookmarks") {
+      return bookmarkedCourses.filter((course: any) => 
+        course.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        course.category?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      );
+    }
+
     if (!productsData || instructors.length === 0) return [];
     
     return productsData.pages.flatMap((page) => {
@@ -88,7 +115,7 @@ const CourseCatalogScreen = () => {
             <Ionicons name="arrow-back" size={24} color="#d3dae7ff" />
           </TouchableOpacity>
           <Text className="text-2xl font-bold text-slate-900 dark:text-white">
-            Course Catalog
+            {filter === "bookmarks" ? "My Bookmarks" : "Course Catalog"}
           </Text>
         </View>
 

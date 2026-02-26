@@ -244,7 +244,20 @@ const CourseDetailsScreen = () => {
         </ScrollView>
 
         {/* Bottom Action Bar */}
-        <View className="p-6 bg-white dark:bg-slate-800 flex-row items-center border-t border-slate-100 dark:border-slate-700">
+        <View className="p-6 bg-white dark:bg-slate-800 flex-row items-center border-t border-slate-100 dark:border-slate-700 space-x-4">
+          {isEnrolled && (
+            <TouchableOpacity
+              className="flex-1 h-14 bg-slate-100 dark:bg-slate-700 rounded-2xl items-center justify-center"
+              onPress={() => router.push({
+                pathname: "/(protected)/courses/content",
+                params: { id: course.id, title: course.name }
+              })}
+            >
+              <Text className="text-slate-900 dark:text-white font-bold text-lg">
+                View Content
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             className={`flex-1 h-14 rounded-2xl items-center justify-center ${isEnrolled ? 'bg-green-500' : 'bg-blue-600'}`}
             onPress={handleEnroll}
