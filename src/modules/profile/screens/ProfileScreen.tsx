@@ -1,19 +1,20 @@
+import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/src/context/AuthContext";
 import { useSnackbar } from "@/src/context/SnackbarContext";
 import AppModal from "@/src/shared/AppModal";
 import PageWrapper from "@/src/shared/PageWrapper";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useColorScheme } from "nativewind";
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, Switch, View } from "react-native";
 
 import { useUpdateAvatarMutation } from "@/src/service/user/user.mutations";
 import { useGetCurrentUserQuery } from "@/src/service/user/user.queries";
 import { pickImageFromLibrary } from "@/src/utils/image-picker";
-import { ProfileAchievements } from "../components/ProfileAchievements";
 import { ProfileHeader } from "../components/ProfileHeader";
 import { ProfileHero } from "../components/ProfileHero";
-import { ProfileStats } from "../components/ProfileStats";
 
 export default function ProfileScreen() {
   const { user: authUser, logout, updateUser } = useAuth();
@@ -22,6 +23,7 @@ export default function ProfileScreen() {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
   const updateAvatar = useUpdateAvatarMutation();
   const router = useRouter();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   
   // 1️⃣ Fetch full user data including avatar
   const { data: currentUserResponse, isLoading: isUserLoading, refetch } = useGetCurrentUserQuery();
@@ -98,16 +100,32 @@ export default function ProfileScreen() {
             isUpdatingAvatar={updateAvatar.isPending}
           />
 
-          <ProfileStats 
-            stats={[
-              { label: "Courses", value: 5 },
-              { label: "Avg. Progress", value: "75%" }
-            ]}
-          />
-
-          <ProfileAchievements 
-            onViewAll={() => { /* Navigate to achievements if implemented */ }}
-          />
+          <ThemedView className="mt-10 px-6">
+            <ThemedText className="text-lg font-bold mb-4 uppercase tracking-widest text-slate-400 text-xs">Settings</ThemedText>
+            
+            <ThemedView className="bg-white dark:bg-slate-800 rounded-3xl p-5 flex-row items-center justify-between border border-slate-100 dark:border-slate-700 shadow-sm">
+              <View className="flex-row items-center">
+                <View className="w-11 h-11 bg-blue-100 dark:bg-blue-900/30 rounded-2xl items-center justify-center mr-4">
+                  <Ionicons 
+                    name={colorScheme === 'dark' ? "moon" : "sunny"} 
+                    size={22} 
+                    color="#3b82f6" 
+                  />
+                </View>
+                <View>
+                  <ThemedText className="font-bold text-base">Dark Mode</ThemedText>
+                  <ThemedText className="text-slate-500 text-xs mt-0.5">Adjust the app's appearance</ThemedText>
+                </View>
+              </View>
+              <Switch
+                value={colorScheme === "dark"}
+                onValueChange={toggleColorScheme}
+                trackColor={{ false: "#e2e8f0", true: "#3b82f6" }}
+                thumbColor={"#fff"}
+                ios_backgroundColor="#e2e8f0"
+              />
+            </ThemedView>
+          </ThemedView>
         </ScrollView>
       </ThemedView>
 
