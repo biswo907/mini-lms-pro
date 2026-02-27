@@ -5,7 +5,14 @@ import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import CourseCard from "../components/CourseCard";
 import SearchBar from "../components/SearchBar";
 
@@ -36,7 +43,7 @@ const CourseCatalogScreen = () => {
   const {
     data: instructorsData,
     isLoading: isLoadingInstructors,
-  } = useInstructorsQuery(50);
+  } = useInstructorsQuery(50, { enabled: filter !== "bookmarks" });
 
   const {
     data: productsData,
@@ -46,13 +53,17 @@ const CourseCatalogScreen = () => {
     isLoading: isLoadingProducts,
     refetch,
     isRefetching,
-  } = useProductsInfiniteQuery(debouncedSearchTerm);
+  } = useProductsInfiniteQuery(debouncedSearchTerm, {
+    enabled: filter !== "bookmarks",
+  });
 
   const instructors = useMemo(() => {
     const rawUsers = instructorsData?.data?.data || instructorsData?.data || [];
     return rawUsers.map((user: any) => ({
       id: user.id || user.login?.uuid || Math.random().toString(),
-      name: user.name ? `${user.name.first || ""} ${user.name.last || ""}`.trim() : user.login?.username || "Instructor",
+      name: user.name
+        ? `${user.name.first || ""} ${user.name.last || ""}`.trim()
+        : user.login?.username || "Instructor",
       avatar: user.picture?.medium || user.picture?.thumbnail || "",
       username: user.login?.username || "anonymous",
     }));
@@ -60,21 +71,24 @@ const CourseCatalogScreen = () => {
 
   const courses = useMemo(() => {
     if (filter === "bookmarks") {
-      return bookmarkedCourses.filter((course: any) => 
-        course.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      return bookmarkedCourses.filter((course: any) =>
+        course.name?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
         course.category?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       );
     }
 
     if (!productsData || instructors.length === 0) return [];
-    
+
     return productsData.pages.flatMap((page) => {
       const productsArray = page?.data?.data || [];
       return productsArray.map((product: any) => {
-        // Use a deterministic way to pick an instructor based on product ID
         const productIdStr = product.id?.toString() || "";
         const instructorIndex = productIdStr
-          ? Math.abs(productIdStr.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)) % instructors.length
+          ? Math.abs(
+              productIdStr
+                .split("")
+                .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
+            ) % instructors.length
           : 0;
 
         return {
@@ -85,17 +99,29 @@ const CourseCatalogScreen = () => {
           category: product.category,
           image: product.image,
           images: product.images || [],
-          instructor: instructors[instructorIndex] || { id: "0", name: "Guest Instructor", avatar: "", username: "guest" },
+          instructor:
+            instructors[instructorIndex] || {
+              id: "0",
+              name: "Guest Instructor",
+              avatar: "",
+              username: "guest",
+            },
         };
       });
     });
-  }, [productsData, instructors]);
+  }, [productsData, instructors, filter, bookmarkedCourses, debouncedSearchTerm]);
 
   const onRefresh = async () => {
-    await refetch();
+    if (filter === "bookmarks") {
+      await loadBookmarks();
+    } else {
+      await refetch();
+    }
   };
 
   const onEndReached = () => {
+    if (filter === "bookmarks") return;
+
     if (hasNextPage && !isFetchingNextPage && !isLoadingProducts) {
       fetchNextPage();
     }
@@ -105,7 +131,10 @@ const CourseCatalogScreen = () => {
     setSearchText(text);
   };
 
-  const loading = isLoadingInstructors || isLoadingProducts;
+  const loading =
+    filter === "bookmarks"
+      ? loadingBookmarks
+      : isLoadingInstructors || isLoadingProducts;
 
   return (
     <PageWrapper>
@@ -128,34 +157,40 @@ const CourseCatalogScreen = () => {
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           refreshControl={
-            <RefreshControl 
-              refreshing={isRefetching} 
+            <RefreshControl
+              refreshing={
+                filter === "bookmarks" ? loadingBookmarks : isRefetching
+              }
               onRefresh={onRefresh}
               tintColor="#3b82f6"
               colors={["#3b82f6"]}
             />
           }
-          ListFooterComponent={() => 
-            isFetchingNextPage ? (
+          ListFooterComponent={() =>
+            filter === "bookmarks" ? (
+              <View className="py-4" />
+            ) : isFetchingNextPage ? (
               <ActivityIndicator size="small" color="#3b82f6" className="py-4" />
-            ) : (
-              !hasNextPage && courses.length > 0 ? (
-                <View className="py-8 items-center">
-                  <Text className="text-slate-400">No more courses found</Text>
-                </View>
-              ) : null
-            )
+            ) : !hasNextPage && courses.length > 0 ? (
+              <View className="py-8 items-center">
+                <Text className="text-slate-400">No more courses found</Text>
+              </View>
+            ) : null
           }
-          ListEmptyComponent={() => 
+          ListEmptyComponent={() =>
             !loading ? (
               <View className="flex-1 items-center justify-center pt-20">
                 <Ionicons name="search" size={48} color="#cbd5e1" />
-                <Text className="text-slate-500 mt-4 text-lg">No courses found matching "{searchText}"</Text>
+                <Text className="text-slate-500 mt-4 text-lg">
+                  No courses found matching "{searchText}"
+                </Text>
               </View>
             ) : (
               <View className="flex-1 items-center justify-center pt-20">
                 <ActivityIndicator size="large" color="#3b82f6" />
-                <Text className="text-slate-500 mt-4">Loading Courses...</Text>
+                <Text className="text-slate-500 mt-4">
+                  Loading Courses...
+                </Text>
               </View>
             )
           }

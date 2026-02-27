@@ -7,7 +7,7 @@ export const COURSE_QUERY_KEYS = {
   instructors: ["instructors"] as const,
 };
 
-export const useProductsInfiniteQuery = (query: string = "") => {
+export const useProductsInfiniteQuery = (query: string = "", p0: { enabled: boolean; }) => {
   return useInfiniteQuery({
     queryKey: [...COURSE_QUERY_KEYS.products, query],
     queryFn: ({ pageParam = 1 }) => fetchProductsApi(pageParam as number, 10, query),
@@ -29,7 +29,7 @@ export const useProductDetailsQuery = (id: string, enabled: boolean = true) => {
   });
 };
 
-export const useInstructorsQuery = (limit: number = 50) => {
+export const useInstructorsQuery = (limit: number = 50, p0: { enabled: boolean; }) => {
   return useQuery({
     queryKey: COURSE_QUERY_KEYS.instructors,
     queryFn: () => fetchInstructorsApi(limit),

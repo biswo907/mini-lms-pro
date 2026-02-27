@@ -34,6 +34,11 @@ export default function HomeScreen() {
     } as any);
   };
 
+  // --- New Dynamic Logic ---
+  const milestoneTarget = 5;
+  const itemsLeft = Math.max(0, milestoneTarget - bookmarkCount);
+  const progressPercentage = Math.min(100, (bookmarkCount / milestoneTarget) * 100);
+
   return (
     <PageWrapper>
       {/* Keep ThemedView only for main background */}
@@ -62,7 +67,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Progress Card / Achievement Card */}
-        {bookmarkCount >= 5 ? (
+        {bookmarkCount >= milestoneTarget ? (
           <View className="bg-amber-500 rounded-3xl p-6 shadow-lg mb-8 relative overflow-hidden">
             {/* Background Decorative Circles */}
             <View className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full" />
@@ -80,7 +85,7 @@ export default function HomeScreen() {
             </ThemedText>
             
             <ThemedText className="text-amber-50/90 mb-4 leading-5">
-              You've bookmarked 5 courses! You're clearly serious about learning. Ready to start your first lesson?
+              You've bookmarked {milestoneTarget} courses! You're clearly serious about learning. Ready to start your first lesson?
             </ThemedText>
 
             <TouchableOpacity 
@@ -99,12 +104,17 @@ export default function HomeScreen() {
               You're doing great!
             </ThemedText>
 
+            {/* Dynamic Progress Bar */}
             <View className="h-2 bg-blue-400 rounded-full overflow-hidden">
-              <View className="h-full bg-white w-3/4 rounded-full" />
+              <View 
+                className="h-full bg-white rounded-full" 
+                style={{ width: `${progressPercentage}%` }} 
+              />
             </View>
 
+            {/* Dynamic Milestone Text */}
             <ThemedText className="text-blue-100 mt-2 text-sm italic">
-              75% of your weekly goal completed
+              {itemsLeft} more bookmark{itemsLeft !== 1 ? 's' : ''} to complete your milestone!
             </ThemedText>
           </View>
         )}
@@ -116,10 +126,6 @@ export default function HomeScreen() {
             <Text className="text-blue-600 font-medium">See All</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Since we don't have courses on home yet, I'll add a placeholder or a few manual ones 
-            that link to the catalog, or I could fetch them. For now, I'll just make the "See All" 
-            and "Quick Actions" work as requested. */}
 
         {/* Quick Actions */}
         <ThemedText type="subtitle" className="mb-4">
