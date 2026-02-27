@@ -9,17 +9,17 @@
 <br/>
 
 <p>
-  <strong>Scalable Architecture • Secure Auth • Offline-First • Performance Optimized</strong>
+  <strong>Scalable Architecture • Secure Auth  • Performance Optimized</strong>
 </p>
 
 <br/>
 
-![Expo](https://img.shields.io/badge/Expo-SDK%20Latest-black?logo=expo)
-![React Native](https://img.shields.io/badge/React%20Native-Production%20Ready-61DAFB?logo=react)
+![Expo](https://img.shields.io/badge/Expo-SDK%2054-black?logo=expo)
+![React Native](https://img.shields.io/badge/React%20Native-0.81.5-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Mode-3178C6?logo=typescript)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20Modular-blue)
-![Engineering](https://img.shields.io/badge/Engineering-FAANG%20Level-purple)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![Engineering](https://img.shields.io/badge/Engineering-Production%20Ready-purple)
+![Status](https://img.shields.io/badge/Status-Active%20Development-success)
 
 </div>
 
@@ -27,18 +27,14 @@
 
 # 🧠 Executive Summary
 
-**Mini LMS Pro** is a senior-level mobile engineering project designed using real-world production standards.
+**Mini LMS Pro** is a high-performance mobile learning management system built with modern engineering standards. It demonstrates a scalable, modular approach to mobile application development, focusing on performance, security, and a premium user experience.
 
-This repository demonstrates how scalable mobile applications should be architected — with a strong focus on:
+This repository serves as a blueprint for production-grade React Native applications, featuring:
 
-- Clean architecture principles
-- Security-first authentication
-- Offline resilience
-- Performance optimization
-- Modular scalability
-- Type safety & maintainability
-
-This project simulates what a real-world LMS mobile product would look like inside a production engineering team.
+- **Modular Clean Architecture**: Feature-based organization for maximum scalability.
+- **Dynamic Course Domain**: High-performance catalog with infinite scroll and advanced search.
+- **Offline Resilience**: Intelligent caching and connectivity-aware UI components.
+- **Modern UI/UX**: Dark mode support, smooth animations, and premium aesthetics using NativeWind (Tailwind CSS).
 
 ---
 
@@ -46,270 +42,140 @@ This project simulates what a real-world LMS mobile product would look like insi
 
 ## Architectural Principles
 
-- Feature-based modular structure
-- Separation of concerns (UI / Domain / Services)
-- Centralized networking layer
-- Secure persistent storage
-- Predictable state management
-- Offline-first design strategy
-- Strict typing across layers
+- **Feature-Based Modularity**: Logic is grouped by domain (Auth, Course, Profile, Home).
+- **Service Layer Pattern**: Dedicated API clients, mutation hooks, and query managers.
+- **Context-Driven State**: Efficient global state management for Auth, Theme, and Notifications.
+- **Atomic UI Components**: Reusable, themed primitives for consistent design.
+- **Type-Safe Contract**: Strict TypeScript interfaces across all layers.
 
 ---
 
 ## 📂 Project Structure
 
 ```bash
-app/            → File-based routing (Expo Router)
-features/       → Domain-driven feature modules
-services/       → API client, storage, network layer
-store/          → Global state container
-components/     → Reusable UI primitives
-utils/          → Shared helpers
-types/          → Type definitions & contracts
+app/                → File-based routing (Expo Router)
+  (auth)/           → Authentication flows (Login, Register)
+  (protected)/      → Secure application area
+src/
+  modules/          → Domain-driven feature modules
+    auth/           → Authentication logic & screens
+    course/         → Course catalog, details & viewer
+    profile/        → User profile, settings & avatar management
+    home/           → Dashboard & discovery
+  service/          → API integration (TanStack Query + Axios)
+  context/          → Global providers (Auth, Theme, Network)
+  shared/           → Reusable UI components & wrappers
+  utils/            → Helpers (Image picker, Formatters)
 ```
 
 ---
 
-# 🔐 Authentication Architecture
+# 🔐 Authentication & Roles
 
-Designed with production security patterns:
+Enterprise-grade authentication system supporting multiple user personas:
 
-- API-driven login & registration
-- Secure token storage via encrypted storage
-- Automatic session restoration
-- Access token refresh handling
-- Secure logout & full state reset
-- Centralized auth guard
-
-### Security Considerations
-
-- No token exposure in UI layer
-- Timeout & retry strategy
-- Persistent session validation
+- **Security Patterns**:
+    - Secure token persistence via `expo-secure-store`.
+    - Automatic session restoration on app launch.
+    - Protected route middleware using Expo Router.
+    - Centralized Auth Context for global session awareness.
 
 ---
 
 # 📚 Course Domain Module
 
-The course system is architected as an isolated feature module.
+A sophisticated course management system designed for speed and usability.
 
-### Capabilities
+### Key Features
 
-- Instructor & course fetching
-- Virtualized high-performance list rendering
-- Pull-to-refresh
-- Debounced search
-- Bookmark persistence
-- Enrollment state management
-- Local cache fallback (offline mode)
-
-### Performance Decisions
-
-- Memoized list rows
-- Controlled re-render boundaries
-- Optimized state selectors
-- Request cancellation strategy
+- **High-Performance Catalog**: Optimized list rendering with `FlashList` concepts and memoization.
+- **Infinite Loading**: Seamless pagination using `@tanstack/react-query`.
+- **Advanced Search**: Debounced real-time search with visual feedback.
+- **Interactive Viewer**: Bidirectional Native ↔ Web communication for course content.
+- **Bookmark System**: Persistent local/remote sync for favorite courses.
 
 ---
 
-# 🌐 WebView Communication Layer
+# 👤 Profile & Personalization
 
-Implements bidirectional native ↔ web communication.
+Premium user experience with deep customization options:
 
-### Native → Web
-
-- Injected dynamic content
-- Controlled script execution
-
-### Web → Native
-
-```js
-window.ReactNativeWebView.postMessage();
-```
-
-### Use Cases
-
-- Progress updates
-- Quiz results
-- Course interaction events
+- **Avatar Management**: In-app image picking and remote upload with server-side sync.
+- **Dynamic Theming**: full Dark/Light mode support via NativeWind.
+- **Role Badge**: Visual identification of user permissions.
 
 ---
 
-# 🔔 Notification Strategy
+# 🔔 Intelligent Notifications
 
-Event-driven engagement model.
+Event-driven engagement model powered by `expo-notifications`:
 
-### Triggers
-
-- 5+ bookmarks milestone
-- 24-hour inactivity reminder
-
-### Architecture
-
-- Permission gating on first launch
-- Event-based notification dispatch
-- Clean notification abstraction layer
+- **Milestone Achievements**: Automated triggers for user milestones (e.g., "5th Bookmark Unlocked").
+- **Engagement Reminders**: Intelligent 24-hour inactivity reminders to boost retention.
+- **Permission Management**: Graceful notification permission handling and gating.
 
 ---
 
-# 📡 Offline-First Strategy
 
-Connectivity awareness is built into the service layer.
 
-### Implementation
 
-- Network state detection
-- Offline banner state
-- Cached response fallback
-- Automatic retry on reconnect
-- Graceful degradation
+# ⚡ Technology Stack
 
-### Design Goal
-
-The app remains usable even without internet access.
-
----
-
-# ⚡ Performance Engineering
-
-Intentional performance optimizations:
-
-- Memoization (`React.memo`, `useMemo`, `useCallback`)
-- Debounced search input
-- API timeout strategy
-- Retry with exponential backoff
-- Image caching
-- Minimal global state usage
-- Lazy evaluation where possible
-
-### Measured Priorities
-
-- Render stability
-- Network efficiency
-- Memory control
-- UX smoothness
+| Category | Technology |
+| :--- | :--- |
+| **Framework** | React Native + Expo (SDK 54) |
+| **Language** | TypeScript (Strict) |
+| **Navigation** | Expo Router (File-based) |
+| **State/Data** | TanStack Query v5 + Axios |
+| **Styling** | NativeWind (Tailwind CSS) + CSS Variables |
+| **Storage** | Secure Store + Async Storage |
+| **Media** | Expo Image + Image Picker |
+| **Tools** | EAS (Expo Application Services) |
 
 ---
 
-# 🔑 Environment Configuration
+# 🚀 Getting Started
 
-Create a `.env` file:
+### Prerequisites
 
-```env
-API_BASE_URL=https://api.freeapi.app
-APP_ENV=development
-```
+- Node.js (v18+)
+- npm / yarn
+- Expo Go (for development)
 
-Environment separation ready for:
+### Setup
 
-- Development
-- Staging
-- Production
+1. **Clone & Install**:
+   ```bash
+   npm install
+   ```
+
+
+3. **Run Application**:
+   ```bash
+   npm start
+   ```
 
 ---
 
-# 🚀 Local Development
+# 📦 Deployment Profiles
 
-Install dependencies:
+Ready-to-use EAS configurations for multiple environments:
 
 ```bash
-npm install
+# Development Build
+npm run build:dev
+
+# Preview Build (Staging)
+npm run build:prev
+
+# Production Release
+npm run build:prod
 ```
-
-Start development server:
-
-```bash
-npx expo start
-```
-
-### Supported Environments
-
-- Android Emulator
-- iOS Simulator
-- Development Build
-- Expo Go (limited mode)
-
----
-
-# 📦 Production Build (Android)
-
-```bash
-eas build -p android --profile development
-```
-
-Install EAS CLI if needed:
-
-```bash
-npm install -g eas-cli
-```
-
----
-
-# 🧪 Engineering Decisions
-
-| Concern            | Strategy                          |
-| ------------------ | --------------------------------- |
-| Scalability        | Feature-based modular design      |
-| Maintainability    | Strong typing & clean separation  |
-| Security           | Encrypted storage + guarded flows |
-| Performance        | Memoization + optimized rendering |
-| Offline Resilience | Cache + retry strategy            |
-| Code Quality       | Strict TypeScript mode            |
-
----
-
-# 🧩 Extensibility
-
-The architecture allows easy integration of:
-
-- Payment gateway
-- Video streaming module
-- Push notifications (FCM / APNS)
-- Role-based access
-- Instructor dashboard
-- Analytics tracking
-
----
-
-# 📊 What This Project Demonstrates
-
-This repository reflects:
-
-- Senior-level mobile system design
-- Production architectural thinking
-- Clean engineering practices
-- Real-world feature abstraction
-- Scalable folder structuring
-- Enterprise-grade code organization
-
----
-
-# 🎯 Ideal Use Cases
-
-- Portfolio showcase
-- Senior-level assignment submission
-- Architecture demonstration
-- Interview discussion project
-- System design walkthrough
-
----
-
-# 📖 Technology Stack
-
-- React Native
-- Expo (Latest SDK)
-- TypeScript (Strict Mode)
-- Axios
-- Expo Router
-- Secure Storage
-- NetInfo
 
 ---
 
 <div align="center">
 
-⭐ If this project impressed you, consider starring the repository.
-
-Built with engineering discipline and production mindset.
+⭐ Built with engineering discipline and a production mindset.
 
 </div>
