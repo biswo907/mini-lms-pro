@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mini-lms-pro",
+    "name": "Mini Lms Pro",
     "slug": "mini-lms-pro",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.biswo907.minilmspro"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,11 +20,13 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.biswo907.minilmspro"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
@@ -38,11 +41,25 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f4222342-4d4a-4af5-8fdb-76d1135885e8"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f4222342-4d4a-4af5-8fdb-76d1135885e8"
     }
   }
 }
