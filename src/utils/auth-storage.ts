@@ -9,6 +9,15 @@ export const STORAGE_KEYS = {
   BOOKMARKS_KEY: "LMS_Course_Bookmarks"
 };
 
+/**
+ * Returns a user-specific bookmark storage key.
+ * If userId is not provided, it falls back to the legacy global key.
+ */
+export const getBookmarkKey = (userId?: string) => {
+  if (!userId) return STORAGE_KEYS.BOOKMARKS_KEY;
+  return `${STORAGE_KEYS.BOOKMARKS_KEY}_${userId}`;
+};
+
 // ==============================
 // Secure Value Storage (Tokens, etc)
 // ==============================

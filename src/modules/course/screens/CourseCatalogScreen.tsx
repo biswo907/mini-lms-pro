@@ -1,7 +1,8 @@
+import { useAuth } from "@/src/context/AuthContext";
 import { useDebounce } from "@/src/hooks/useDebounce";
 import { useInstructorsQuery, useProductsInfiniteQuery } from "@/src/service/course/course.queries";
 import PageWrapper from "@/src/shared/PageWrapper";
-import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
+import { getBookmarkKey, storage } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -17,6 +18,7 @@ import CourseCard from "../components/CourseCard";
 import SearchBar from "../components/SearchBar";
 
 const CourseCatalogScreen = () => {
+  const { user } = useAuth();
   const router = useRouter();
   const params = useLocalSearchParams();
   const filter = params.filter as string;
@@ -35,7 +37,8 @@ const CourseCatalogScreen = () => {
 
   const loadBookmarks = async () => {
     setLoadingBookmarks(true);
-    const bookmarks = await storage.getValue(STORAGE_KEYS.BOOKMARKS_KEY);
+    const bookmarkKey = getBookmarkKey(user?._id);
+    const bookmarks = await storage.getValue(bookmarkKey);
     setBookmarkedCourses(bookmarks || []);
     setLoadingBookmarks(false);
   };

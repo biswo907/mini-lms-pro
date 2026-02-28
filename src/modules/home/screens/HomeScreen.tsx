@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/src/context/AuthContext";
 import PageWrapper from "@/src/shared/PageWrapper";
-import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
+import { getBookmarkKey, storage } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -16,7 +16,8 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       const getBookmarks = async () => {
-        const bookmarks = await storage.getValue(STORAGE_KEYS.BOOKMARKS_KEY);
+        const bookmarkKey = getBookmarkKey(user?._id);
+        const bookmarks = await storage.getValue(bookmarkKey);
         if (bookmarks) {
           setBookmarkCount(bookmarks.length);
         } else {
@@ -24,7 +25,7 @@ export default function HomeScreen() {
         }
       };
       getBookmarks();
-    }, [])
+    }, [user])
   );
 
   const handleNavigateToCourses = (filter?: string) => {

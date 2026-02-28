@@ -1,8 +1,9 @@
+import { useAuth } from "@/src/context/AuthContext";
 import { useProductDetailsQuery } from "@/src/service/course/course.queries";
 import { NotificationService } from "@/src/service/notification/NotificationService";
 import AppModal from "@/src/shared/AppModal";
 import PageWrapper from "@/src/shared/PageWrapper";
-import { storage, STORAGE_KEYS } from "@/src/utils/auth-storage";
+import { getBookmarkKey, storage } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -11,6 +12,7 @@ import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, Text, Touch
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const CourseDetailsScreen = () => {
+  const { user } = useAuth();
   const router = useRouter();
   const params = useLocalSearchParams();
   const productId = params.id as string;
@@ -61,7 +63,8 @@ const CourseDetailsScreen = () => {
 
   const checkBookmarkStatus = async () => {
     if (!course?.id) return;
-    const bookmarks = await storage.getValue(STORAGE_KEYS?.BOOKMARKS_KEY) || [];
+    const bookmarkKey = getBookmarkKey(user?._id);
+    const bookmarks = await storage.getValue(bookmarkKey) || [];
     setIsBookmarked(bookmarks.some((b: any) => b.id === course.id));
   };
 
@@ -72,14 +75,15 @@ const CourseDetailsScreen = () => {
 
   const handleConfirmBookmark = async () => {
     if (!course?.id) return;
-    let bookmarks = (await storage.getValue(STORAGE_KEYS?.BOOKMARKS_KEY)) || [];
+    const bookmarkKey = getBookmarkKey(user?._id);
+    let bookmarks = (await storage.getValue(bookmarkKey)) || [];
     if (isBookmarked) {
       bookmarks = bookmarks.filter((b: any) => b.id !== course.id);
     } else {
       bookmarks.push(course);
     }
 
-    await storage.setValue(STORAGE_KEYS?.BOOKMARKS_KEY, bookmarks);
+    await storage.setValue(bookmarkKey, bookmarks);
     setIsBookmarked(!isBookmarked);
     setShowBookmarkModal(false);
 
