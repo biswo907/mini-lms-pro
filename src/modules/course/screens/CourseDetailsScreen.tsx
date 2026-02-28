@@ -8,9 +8,13 @@ import { getBookmarkKey, storage } from "@/src/utils/auth-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import { ActivityIndicator, ScrollView, Text, View, useColorScheme } from "react-native";
+import CourseActionButtons from "../components/details/CourseActionButtons";
+import CourseDescription from "../components/details/CourseDescription";
+import CourseFeaturesGrid from "../components/details/CourseFeaturesGrid";
+import CourseHeader from "../components/details/CourseHeader";
+import CourseImageSwiper from "../components/details/CourseImageSwiper";
+import InstructorCard from "../components/details/InstructorCard";
 
 const CourseDetailsScreen = () => {
   const { user } = useAuth();
@@ -28,8 +32,8 @@ const CourseDetailsScreen = () => {
 
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
 
   const course = useMemo(() => {
     const product = productData?.data;
@@ -42,6 +46,12 @@ const CourseDetailsScreen = () => {
       console.error("Error parsing instructor:", e);
     }
 
+   
+    const randomImages = [1, 2, 3, 4].map(
+      (item) => `https://picsum.photos/800/600?random=${product.id}-${item}`
+    );
+    const combinedImages = [...randomImages];
+
     return {
       id: product.id,
       name: product.title,
@@ -51,8 +61,8 @@ const CourseDetailsScreen = () => {
       rating: product.rating,
       brand: product.brand,
       category: product.category,
-      image: product.images?.[0] || product.thumbnail || product.image,
-      images: product.images || [],
+      image: product.thumbnail || product.image,
+      images: combinedImages,
       instructor: instructor,
     };
   }, [productData, params.instructor]);
@@ -68,11 +78,6 @@ const CourseDetailsScreen = () => {
     const bookmarkKey = getBookmarkKey(user?._id);
     const bookmarks = await storage.getValue(bookmarkKey) || [];
     setIsBookmarked(bookmarks.some((b: any) => b.id === course.id));
-  };
-
-  const toggleBookmark = async () => {
-    if (!course?.id) return;
-    setShowBookmarkModal(true);
   };
 
   const handleConfirmBookmark = async () => {
@@ -93,24 +98,14 @@ const CourseDetailsScreen = () => {
     );
     setShowBookmarkModal(false);
 
-    // Check for 5+ bookmarks milestone
     if (!isBookmarked && bookmarks.length === 5) {
       await NotificationService.scheduleBookmarkMilestoneNotification(bookmarks.length);
     }
   };
 
-  const [showEnrollModal, setShowEnrollModal] = useState(false);
-
   const handleEnroll = () => {
     setIsEnrolled(true);
     setShowEnrollModal(true);
-  };
-
-  const onScroll = (event: any) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
-    const index = event.nativeEvent.contentOffset.x / slideSize;
-    const roundIndex = Math.round(index);
-    setActiveImageIndex(roundIndex);
   };
 
   if (loading) {
@@ -128,14 +123,8 @@ const CourseDetailsScreen = () => {
         <Ionicons name="alert-circle-outline" size={64} color="#ef4444" />
         <Text className="mt-4 text-xl font-bold text-slate-900 dark:text-white">Course Not Found</Text>
         <Text className="mt-2 text-slate-500 text-center">
-          We couldn't find the course you're looking for. It may have been removed or the ID is invalid.
+          We couldn't find the course you're looking for.
         </Text>
-        <TouchableOpacity 
-          onPress={() => router.back()} 
-          className="mt-8 px-8 py-4 bg-blue-600 rounded-2xl"
-        >
-          <Text className="text-white font-bold text-lg">Go Back</Text>
-        </TouchableOpacity>
       </View>
     );
   }
@@ -158,142 +147,49 @@ const CourseDetailsScreen = () => {
           onClose={() => setShowEnrollModal(false)}
           onConfirm={() => setShowEnrollModal(false)}
           title="Success!"
-          description="You have successfully enrolled in this course! You can now access all the lessons."
+          description="You have successfully enrolled in this course!"
           confirmText="Got it"
           type="success"
         />
-        {/* Swiper Image Selection */}
-        <View className="relative h-80">
-          <FlatList
-            data={course.images && course.images.length > 0 ? course.images : [course.image]}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                className="w-screen h-full"
-                resizeMode="cover"
-                style={{ width: SCREEN_WIDTH }}
-              />
-            )}
-          />
 
-          {/* Pagination Dots */}
-          <View className="absolute bottom-10 w-full flex-row justify-center items-center">
-            {(course.images && course.images.length > 1) && course.images.map((_: any, index: number) => (
-              <View
-                key={index}
-                className={`h-2 rounded-full mx-1 ${activeImageIndex === index ? 'w-6 bg-blue-600' : 'w-2 bg-white/60'}`}
-              />
-            ))}
-          </View>
-
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="absolute top-12 left-6 w-10 h-10 bg-white/90 dark:bg-slate-800/90 rounded-full items-center justify-center shadow-lg"
-          >
-            <Ionicons name="arrow-back" size={24} color={iconColor} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={toggleBookmark}
-            className="absolute top-12 right-6 w-10 h-10 bg-white/90 dark:bg-slate-800/90 rounded-full items-center justify-center shadow-lg"
-          >
-            <Ionicons
-              name={isBookmarked ? "bookmark" : "bookmark-outline"}
-              size={24}
-              color={isBookmarked ? "#3b82f6" : iconColor}
-            />
-          </TouchableOpacity>
-        </View>
+        <CourseImageSwiper
+          images={course.images}
+          image={course.image}
+          onBack={() => router.back()}
+          onToggleBookmark={() => setShowBookmarkModal(true)}
+          isBookmarked={isBookmarked}
+          iconColor={iconColor}
+        />
 
         <ScrollView className="flex-1 -mt-6 bg-slate-50 dark:bg-slate-900 rounded-t-[32px] px-6 pt-8">
-          <View className="flex-row justify-between items-start mb-4">
-            <View className="flex-1">
-              <View className="flex-row items-center mb-1">
-                <Text className="text-blue-600 font-bold mr-2">{course.category?.toUpperCase() || "COURSE"}</Text>
-                {course.brand && (
-                  <View className="bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-md">
-                    <Text className="text-slate-600 dark:text-slate-400 text-xs font-bold uppercase">{course.brand}</Text>
-                  </View>
-                )}
-              </View>
-              <Text className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
-                {course.name}
-              </Text>
-            </View>
-            <View className="items-end">
-              <Text className="text-2xl font-bold text-blue-600 ml-4">₹ {course.price}</Text>
-              {course.discountPercentage && (
-                <Text className="text-green-600 text-xs font-bold mt-1">-{course.discountPercentage}% OFF</Text>
-              )}
-            </View>
-          </View>
+          <CourseHeader
+            name={course.name}
+            category={course.category}
+            brand={course.brand}
+            price={course.price}
+            discountPercentage={course.discountPercentage}
+          />
 
-          {/* Instructor Box */}
-          <View className="flex-row items-center bg-white dark:bg-slate-800 p-4 rounded-3xl mb-6 shadow-sm">
-            <Image
-              source={{ uri: course.instructor?.avatar }}
-              className="w-12 h-12 rounded-2xl"
-            />
-            <View className="ml-4">
-              <Text className="text-slate-900 dark:text-white font-bold">{course.instructor?.name}</Text>
-              <Text className="text-slate-500 dark:text-slate-400 text-sm">Course Instructor</Text>
-            </View>
-          </View>
+          <InstructorCard instructor={course.instructor} />
 
-          <Text className="text-lg font-bold text-slate-900 dark:text-white mb-2">About this course</Text>
-          <Text className="text-slate-600 dark:text-slate-400 leading-6 mb-8">
-            {course.description}
-          </Text>
+          <CourseDescription description={course.description} />
 
-          {/* Features Grid */}
-          <View className="flex-row flex-wrap justify-between mb-8">
-            <DetailItem icon="star-outline" label={`${course.rating || "4.5"} Rating`} />
-            <DetailItem icon="people-outline" label="1.2k Students" />
-            <DetailItem icon="time-outline" label="12 Hours" />
-            <DetailItem icon="document-text-outline" label="24 Lessons" />
-          </View>
+          <CourseFeaturesGrid rating={course.rating} />
         </ScrollView>
 
-        {/* Bottom Action Bar */}
-        <View className="p-6 bg-white dark:bg-slate-800 flex-row items-center border-t border-slate-100 dark:border-slate-700 space-x-4">
-          {isEnrolled && (
-            <TouchableOpacity
-              className="flex-1 h-14 bg-slate-100 dark:bg-slate-700 rounded-2xl items-center justify-center"
-              onPress={() => router.push({
-                pathname: "/(protected)/courses/content",
-                params: { id: course.id, title: course.name }
-              })}
-            >
-              <Text className="text-slate-900 dark:text-white font-bold text-lg">
-                View Content
-              </Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            className={`flex-1 h-14 rounded-2xl items-center justify-center ${isEnrolled ? 'bg-green-500' : 'bg-blue-600'}`}
-            onPress={handleEnroll}
-            disabled={isEnrolled}
-          >
-            <Text className="text-white font-bold text-lg">
-              {isEnrolled ? "Enrolled" : "Enroll Now"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <CourseActionButtons
+          isEnrolled={isEnrolled}
+          onEnroll={handleEnroll}
+          onViewContent={() => router.push({
+            pathname: "/(protected)/courses/content",
+            params: { id: course.id, title: course.name }
+          })}
+        />
       </View>
     </PageWrapper>
   );
 };
 
-const DetailItem = ({ icon, label }: { icon: any; label: string }) => (
-  <View className="w-[48%] flex-row items-center bg-slate-100 dark:bg-slate-700/50 p-3 rounded-2xl mb-3">
-    <Ionicons name={icon} size={20} color="#3b82f6" />
-    <Text className="ml-2 text-slate-700 dark:text-slate-300 font-medium">{label}</Text>
-  </View>
-);
-
 export default CourseDetailsScreen;
+
+

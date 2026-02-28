@@ -19,11 +19,21 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         params: { id: course.id, instructor: JSON.stringify(course.instructor) }
       })}
     >
+    
       <Image
-        source={{ uri: course?.image?.[0] }}
-        className="w-24 h-24 rounded-2xl bg-slate-100"
-        resizeMode="cover"
-      />
+  source={{
+    uri:
+      course?.image?.[0] ||
+      `https://picsum.photos/200?random=${course?.id || 1}`,
+  }}
+  onError={(e) => {
+    e.currentTarget.setNativeProps({
+      src: `https://picsum.photos/200?random=${course?.id || 1}`,
+    });
+  }}
+  className="w-24 h-24 rounded-2xl bg-slate-100"
+  resizeMode="cover"
+/>
       <View className="flex-1 ml-4 justify-between">
         <View>
           <Text className="text-slate-900 dark:text-white font-bold text-lg leading-tight mb-1" numberOfLines={2}>
