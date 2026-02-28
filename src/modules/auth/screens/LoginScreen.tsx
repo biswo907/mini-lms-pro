@@ -63,7 +63,7 @@ export default function LoginScreen() {
             <View className="w-20 h-20 bg-blue-600 rounded-3xl items-center justify-center mb-4 shadow-lg">
               <Ionicons name="school" size={40} color="white" />
             </View>
-            <ThemedText type="title" className="text-3xl font-bold text-slate-900 dark:text-white">
+            <ThemedText type="title" className="text-4xl font-bold text-slate-900 dark:text-white">
               Welcome Back
             </ThemedText>
             <ThemedText className="text-slate-500 dark:text-slate-400 mt-2">
