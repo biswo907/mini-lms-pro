@@ -34,6 +34,7 @@ This repository serves as a blueprint for production-grade React Native applicat
 - **Modular Clean Architecture**: Feature-based organization for maximum scalability.
 - **Dynamic Course Domain**: High-performance catalog with infinite scroll and advanced search.
 - **Offline Resilience**: Intelligent caching and connectivity-aware UI components.
+- **Connectivity Feedback**: Real-time offline banner for immediate user awareness.
 - **Modern UI/UX**: Dark mode support, smooth animations, and premium aesthetics using NativeWind (Tailwind CSS).
 
 ---
@@ -64,7 +65,7 @@ src/
     home/           → Dashboard & discovery
   service/          → API integration (TanStack Query + Axios)
   context/          → Global providers (Auth, Theme, Network)
-  shared/           → Reusable UI components & wrappers
+  shared/           → Reusable UI components (OfflineBanner, etc.)
   utils/            → Helpers (Image picker, Formatters)
 ```
 
@@ -116,6 +117,17 @@ Event-driven engagement model powered by `expo-notifications`:
 
 ---
 
+# 🌐 Connectivity & Offline Mode
+
+Designed for reliability in varying network conditions:
+
+- **Real-time Monitoring**: Powered by `@react-native-community/netinfo`.
+- **Global Network State**: Centralized `NetworkProvider` for app-wide connectivity awareness.
+- **Offline Banner**: Sticky, top-level banner alerting users when the connection is lost.
+- **Graceful Degradation**: Optimized to handle offline states without crashing.
+
+---
+
 
 
 
@@ -130,6 +142,7 @@ Event-driven engagement model powered by `expo-notifications`:
 | **Styling** | NativeWind (Tailwind CSS) + CSS Variables |
 | **Storage** | Secure Store + Async Storage |
 | **Media** | Expo Image + Image Picker |
+| **Connectivity** | NetInfo (@react-native-community/netinfo) |
 | **Tools** | EAS (Expo Application Services) |
 
 ---

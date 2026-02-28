@@ -1,4 +1,5 @@
 import { useAuth } from "@/src/context/AuthContext";
+import { useSnackbar } from "@/src/context/SnackbarContext";
 import { useProductDetailsQuery } from "@/src/service/course/course.queries";
 import { NotificationService } from "@/src/service/notification/NotificationService";
 import AppModal from "@/src/shared/AppModal";
@@ -13,6 +14,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const CourseDetailsScreen = () => {
   const { user } = useAuth();
+  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const params = useLocalSearchParams();
   const productId = params.id as string;
@@ -85,6 +87,10 @@ const CourseDetailsScreen = () => {
 
     await storage.setValue(bookmarkKey, bookmarks);
     setIsBookmarked(!isBookmarked);
+    showSnackbar(
+      isBookmarked ? "Course removed from your bookmarks." : "Course added to your bookmarks! 📚",
+      isBookmarked ? "info" : "success"
+    );
     setShowBookmarkModal(false);
 
     // Check for 5+ bookmarks milestone

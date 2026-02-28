@@ -2,40 +2,96 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useSnackbar } from '@/src/context/SnackbarContext';
 import { useRegisterMutation } from '@/src/service/auth/auth.mutations';
+import { AppButton } from '@/src/shared/components/AppButton';
+import { AppInput } from '@/src/shared/components/AppInput';
 import PageWrapper from '@/src/shared/PageWrapper';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
 
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
   const registerMutation = useRegisterMutation();
 
-  const handleRegister = async () => {
-    if (!username || !email || !password) {
-      showSnackbar('Please fill in all fields', 'error');
-      return;
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    // Trimming username and email
+    const cleanValue = (field === 'username' || field === 'email') ? value.trim() : value;
+    
+    setFormData(prev => ({ ...prev, [field]: cleanValue }));
+    // Clear error when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validate = () => {
+    let isValid = true;
+    const newErrors = { username: '', email: '', password: '' };
+
+    // Username validation
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
+      isValid = false;
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+      isValid = false;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    // Password validation (8+ chars, uppercase, lowercase, number, special char)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password = 'Password must be 8+ characters with uppercase, lowercase, number, and special character';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleRegister = async () => {
+    if (!validate()) return;
+
     registerMutation.mutate(
-      { username: username?.toLowerCase(), email, password, role: 'ADMIN' }, // . role as student
+      { 
+        username: formData.username.toLowerCase(), 
+        email: formData.email, 
+        password: formData.password, 
+        role: 'ADMIN' 
+      },
       {
         onSuccess: () => {
           showSnackbar('Account created successfully!', 'success');
@@ -86,82 +142,49 @@ export default function RegisterScreen() {
                 </View>
 
                 <View className="space-y-4">
-                  <View>
-                    <ThemedText className="mb-2 font-medium text-slate-700 dark:text-slate-300">
-                      Username
-                    </ThemedText>
-                    <TextInput
-                      className="w-full h-14 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-slate-900 dark:text-white"
-                      placeholder="Pick a unique username"
-                      placeholderTextColor="#94a3b8"
-                      value={username}
-                      onChangeText={setUsername}
-                      autoCapitalize="none"
-                    />
-                  </View>
+                  <AppInput
+                    label="Username"
+                    placeholder="Pick a unique username"
+                    value={formData.username}
+                    onChangeText={(val) => handleInputChange('username', val)}
+                    autoCapitalize="none"
+                    error={errors.username}
+                    icon="person-outline"
+                  />
 
-                  <View>
-                    <ThemedText className="mb-2 font-medium text-slate-700 dark:text-slate-300">
-                      Email Address
-                    </ThemedText>
-                    <TextInput
-                      className="w-full h-14 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-slate-900 dark:text-white"
-                      placeholder="example@mail.com"
-                      placeholderTextColor="#94a3b8"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                    />
-                  </View>
+                  <AppInput
+                    label="Email Address"
+                    placeholder="example@mail.com"
+                    value={formData.email}
+                    onChangeText={(val) => handleInputChange('email', val)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    error={errors.email}
+                    icon="mail-outline"
+                  />
 
-                  <View>
-                    <ThemedText className="mb-2 font-medium text-slate-700 dark:text-slate-300">
-                      Password
-                    </ThemedText>
-                    <View className="relative">
-                      <TextInput
-                        className="w-full h-14 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 text-slate-900 dark:text-white"
-                        placeholder="At least 6 characters"
-                        placeholderTextColor="#94a3b8"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                      />
-                      <TouchableOpacity
-                        className="absolute right-4 top-4"
-                        onPress={() => setShowPassword(!showPassword)}
-                      >
-                        <Ionicons
-                          name={showPassword ? 'eye-off' : 'eye'}
-                          size={22}
-                          color="#64748b"
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  <AppInput
+                    label="Password"
+                    placeholder="Strong password"
+                    value={formData.password}
+                    onChangeText={(val) => handleInputChange('password', val)}
+                    isPassword
+                    error={errors.password}
+                    icon="lock-closed-outline"
+                  />
 
-                  <TouchableOpacity
-                    className="mt-8 w-full h-14 bg-blue-600 rounded-2xl items-center justify-center shadow-md active:bg-blue-700"
+                  <AppButton
+                    title="Create Account"
                     onPress={handleRegister}
-                    disabled={registerMutation.isPending}
-                  >
-                    {registerMutation.isPending ? (
-                      <ActivityIndicator color="white" />
-                    ) : (
-                      <ThemedText className="text-white font-bold text-lg">
-                        Create Account
-                      </ThemedText>
-                    )}
-                  </TouchableOpacity>
+                    isLoading={registerMutation.isPending}
+                    className="mt-8"
+                  />
 
                   <View className="flex-row justify-center mt-6 mb-10">
                     <ThemedText className="text-slate-500 dark:text-slate-400">
                       Already have an account?{' '}
                     </ThemedText>
-                    <TouchableOpacity
-                      onPress={() => router.push('/(auth)/login')}
-                    >
+                    <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
                       <ThemedText className="text-blue-600 font-bold">
                         Sign In
                       </ThemedText>
